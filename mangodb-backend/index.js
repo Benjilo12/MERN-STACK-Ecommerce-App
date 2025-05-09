@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { connectDB } from "./db/connectDB.js";
 
 import authRoutes from "./routes/auth.route.js";
@@ -10,6 +11,7 @@ const PORT = process.env.Port || 8000;
 
 //middleware
 app.use(express.json()); //allows us to parse incoming request :req.body
+app.use(cookieParser()); //allows us to parse incoming cookies
 
 connectDB();
 
