@@ -3,16 +3,27 @@ import Input from "../components/Input";
 import { User } from "lucide-react";
 import { Lock } from "lucide-react";
 import { Mail } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordStrength from "../components/PasswordStrength";
+import { useAuthstore } from "../store/authStore";
 
 function SignUpPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const handleSignUp = (e) => {
+  const navigate = useNavigate();
+  const { signup, error, isLoading } = useAuthstore();
+  const handleSignUp = async (e) => {
     e.preventDefault();
+
+    try {
+      await signup(email, password, name);
+      navigate("/verify-email");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -48,15 +59,22 @@ function SignUpPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-
+            {error && (
+              <p className="text-red-500 font-semibold mt-2">{error}</p>
+            )}
             <PasswordStrength password={password} />
             <motion.button
               className="mt-4 w-full py-2 px-4 text-white font-bold rounded-lg shadow-lg focus:outline-none  bg-blue-600 focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200 hover:bg-blue-400 text-[20px] cursor-pointer"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
+              disabled={isLoading}
             >
-              Sign up
+              {isLoading ? (
+                <Loader className="animate-spin mx-auto" size={24} />
+              ) : (
+                "Sign Up"
+              )}
             </motion.button>
           </form>
         </div>

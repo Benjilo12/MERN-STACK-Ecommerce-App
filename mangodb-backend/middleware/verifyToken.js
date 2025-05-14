@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { User } from "../models/user.model.js";
 
 export const verifyToken = (req, res, next) => {
   const token = req.cookies.token;
@@ -18,6 +19,21 @@ export const verifyToken = (req, res, next) => {
     next();
   } catch (error) {
     console.log("Error in verifyToken ", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const adminRoute = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user || user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied" });
+    }
+
+    next();
+  } catch (error) {
+    console.error("adminRoute error:", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
